@@ -1,4 +1,4 @@
-export type Theme = 'flat' | 'neumorphic';
+export type Theme = 'light' | 'dark';
 
 export interface TimeSlot {
   hour: number;

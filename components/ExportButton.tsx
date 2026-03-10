@@ -3,7 +3,7 @@ import { Download } from 'lucide-react';
 import { DayPlan, formatHour } from '@/lib/types';
 
 export default function ExportButton({ plan, theme }: { plan: DayPlan; theme: string }) {
-  const isNeu = theme === 'neumorphic';
+  const isDark = theme === 'dark';
 
   const handleExport = () => {
     const lines: string[] = [
@@ -38,13 +38,16 @@ export default function ExportButton({ plan, theme }: { plan: DayPlan; theme: st
     URL.revokeObjectURL(url);
   };
 
-  const btnCls = isNeu
-    ? 'flex items-center gap-1.5 px-3 py-1.5 text-sm bg-[#e0e5ec] rounded-lg shadow-[3px_3px_6px_#b8bec7,-3px_-3px_6px_#ffffff] active:shadow-[inset_2px_2px_4px_#b8bec7,inset_-2px_-2px_4px_#ffffff] text-gray-600 hover:text-gray-800'
-    : 'flex items-center gap-1.5 px-3 py-1.5 text-sm border-2 border-gray-800 bg-white hover:bg-gray-100 text-gray-800 font-medium';
-
   return (
-    <button onClick={handleExport} className={btnCls}>
-      <Download className="w-4 h-4" />
+    <button
+      onClick={handleExport}
+      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg transition-colors font-medium ${
+        isDark
+          ? 'text-[#71717A] hover:text-[#FAFAFA] hover:bg-white/[0.07] border border-white/[0.07]'
+          : 'text-[#6B7280] hover:text-[#111111] hover:bg-black/[0.05] border border-black/[0.07]'
+      }`}
+    >
+      <Download className="w-3.5 h-3.5" />
       내보내기
     </button>
   );

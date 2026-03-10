@@ -32,7 +32,7 @@ function makePlan(date: string, theme: Theme): DayPlan {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
-      theme: 'flat',
+      theme: 'light',
       plans: {},
       streak: {
         currentStreak: 0,

@@ -1,32 +1,25 @@
 'use client';
 import { useAppStore } from '@/lib/store';
-import { Theme } from '@/lib/types';
+import { Sun, Moon } from 'lucide-react';
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useAppStore();
+  const isDark = theme === 'dark';
 
   return (
-    <div className="flex items-center gap-2">
-      <button
-        onClick={() => setTheme('flat')}
-        className={`px-3 py-1.5 text-sm font-medium rounded transition-all ${
-          theme === 'flat'
-            ? 'bg-[#4ECDC4] text-white'
-            : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-        }`}
-      >
-        Flat
-      </button>
-      <button
-        onClick={() => setTheme('neumorphic')}
-        className={`px-3 py-1.5 text-sm font-medium rounded transition-all ${
-          theme === 'neumorphic'
-            ? 'bg-[#e0e5ec] text-gray-700 shadow-[3px_3px_6px_#b8bec7,-3px_-3px_6px_#ffffff]'
-            : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-        }`}
-      >
-        Neumorphic
-      </button>
-    </div>
+    <button
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+        isDark
+          ? 'bg-[#27272A] border border-white/[0.07] text-[#A1A1AA] hover:text-[#FAFAFA]'
+          : 'bg-white border border-black/[0.07] text-[#6B7280] hover:text-[#111111] shadow-[0_1px_2px_rgba(0,0,0,0.05)]'
+      }`}
+    >
+      {isDark
+        ? <Sun className="w-3.5 h-3.5" />
+        : <Moon className="w-3.5 h-3.5" />
+      }
+      {isDark ? 'Light' : 'Dark'}
+    </button>
   );
 }

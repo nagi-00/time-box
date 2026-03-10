@@ -4,48 +4,58 @@ import { DayPlan } from '@/lib/types';
 
 export default function PrioritiesPanel({ plan, theme }: { plan: DayPlan; theme: string }) {
   const { updatePriority, updateBrainDump } = useAppStore();
-  const isNeu = theme === 'neumorphic';
+  const isDark = theme === 'dark';
 
-  const inputCls = isNeu
-    ? 'w-full px-3 py-2 rounded-lg bg-[#e0e5ec] shadow-[inset_3px_3px_6px_#b8bec7,inset_-3px_-3px_6px_#ffffff] outline-none text-sm text-gray-700 placeholder-gray-400 focus:shadow-[inset_4px_4px_8px_#b8bec7,inset_-4px_-4px_8px_#ffffff]'
-    : 'w-full px-2 py-1.5 border-2 border-gray-800 bg-transparent text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#4ECDC4]';
+  const cardCls = isDark
+    ? 'bg-[#18181B] border border-white/[0.07] rounded-2xl p-4'
+    : 'bg-white border border-black/[0.07] rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] p-4';
 
-  const labelCls = isNeu
-    ? 'text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block'
-    : 'text-xs font-bold text-gray-800 uppercase mb-1 block';
+  const labelCls = `text-[10px] font-semibold uppercase tracking-widest mb-3 block ${
+    isDark ? 'text-[#3F3F46]' : 'text-[#C4BDB7]'
+  }`;
 
-  const sectionCls = isNeu
-    ? 'bg-[#e0e5ec] rounded-2xl shadow-[6px_6px_12px_#b8bec7,-6px_-6px_12px_#ffffff] p-4'
-    : 'border-2 border-gray-800 bg-[#4ECDC4]/10 p-3';
+  const inputCls = `w-full bg-transparent outline-none text-sm pb-2 transition-colors border-b ${
+    isDark
+      ? 'text-[#E4E4E7] placeholder-[#3F3F46] border-white/[0.07] focus:border-indigo-500'
+      : 'text-[#374151] placeholder-[#E5E7EB] border-black/[0.07] focus:border-indigo-400'
+  }`;
+
+  const badgeCls = `w-5 h-5 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 ${
+    isDark ? 'bg-indigo-500/15 text-indigo-400' : 'bg-indigo-50 text-indigo-500'
+  }`;
 
   return (
     <div className="flex flex-col gap-4">
       {/* Top Priorities */}
-      <div className={sectionCls}>
-        <label className={labelCls}>Top Priorities</label>
-        <div className="flex flex-col gap-2">
+      <div className={cardCls}>
+        <label className={labelCls}>Priorities</label>
+        <div className="flex flex-col gap-4">
           {[0, 1, 2].map((i) => (
-            <input
-              key={i}
-              type="text"
-              value={plan.priorities[i] || ''}
-              onChange={(e) => updatePriority(i, e.target.value)}
-              placeholder={`Priority ${i + 1}`}
-              className={inputCls}
-            />
+            <div key={i} className="flex items-center gap-2.5">
+              <span className={badgeCls}>{i + 1}</span>
+              <input
+                type="text"
+                value={plan.priorities[i] || ''}
+                onChange={(e) => updatePriority(i, e.target.value)}
+                placeholder={`우선순위 ${i + 1}`}
+                className={inputCls}
+              />
+            </div>
           ))}
         </div>
       </div>
 
       {/* Brain Dump */}
-      <div className={sectionCls}>
+      <div className={cardCls}>
         <label className={labelCls}>Brain Dump</label>
         <textarea
           value={plan.brainDump}
           onChange={(e) => updateBrainDump(e.target.value)}
           placeholder="모든 생각을 쏟아내세요..."
-          rows={8}
-          className={`${inputCls} resize-none`}
+          rows={10}
+          className={`w-full bg-transparent outline-none text-sm resize-none leading-relaxed ${
+            isDark ? 'text-[#A1A1AA] placeholder-[#3F3F46]' : 'text-[#6B7280] placeholder-[#E5E7EB]'
+          }`}
         />
       </div>
     </div>

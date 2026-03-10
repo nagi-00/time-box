@@ -4,41 +4,31 @@ import { Flame, Trophy, Calendar } from 'lucide-react';
 
 export default function StreakBar({ theme }: { theme: string }) {
   const streak = useAppStore((s) => s.streak);
-  const isNeu = theme === 'neumorphic';
+  const isDark = theme === 'dark';
 
-  const cardCls = isNeu
-    ? 'bg-[#e0e5ec] rounded-xl shadow-[4px_4px_8px_#b8bec7,-4px_-4px_8px_#ffffff] p-3 flex items-center gap-2'
-    : 'bg-[#4ECDC4]/20 border border-[#4ECDC4] rounded p-2 flex items-center gap-2';
+  const cardCls = isDark
+    ? 'flex items-center gap-3 px-4 py-3 bg-[#18181B] border border-white/[0.07] rounded-xl'
+    : 'flex items-center gap-3 px-4 py-3 bg-white border border-black/[0.07] rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)]';
+
+  const stats = [
+    { icon: Flame, label: '연속일', value: streak.currentStreak, iconCls: 'text-orange-400' },
+    { icon: Trophy, label: '최장 기록', value: streak.longestStreak, iconCls: 'text-yellow-400' },
+    { icon: Calendar, label: '총 계획일', value: streak.totalDays, iconCls: isDark ? 'text-indigo-400' : 'text-indigo-500' },
+  ];
 
   return (
     <div className="flex gap-3 flex-wrap">
-      <div className={cardCls}>
-        <Flame className="w-4 h-4 text-orange-500" />
-        <div>
-          <div className={`text-lg font-bold ${isNeu ? 'text-gray-700' : 'text-gray-800'}`}>
-            {streak.currentStreak}
+      {stats.map(({ icon: Icon, label, value, iconCls }) => (
+        <div key={label} className={cardCls}>
+          <Icon className={`w-4 h-4 shrink-0 ${iconCls}`} />
+          <div>
+            <div className={`text-xl font-semibold tabular-nums leading-none ${isDark ? 'text-[#FAFAFA]' : 'text-[#111111]'}`}>
+              {value}
+            </div>
+            <div className={`text-xs mt-0.5 ${isDark ? 'text-[#52525B]' : 'text-[#A8A29E]'}`}>{label}</div>
           </div>
-          <div className="text-xs text-gray-500">연속 일수</div>
         </div>
-      </div>
-      <div className={cardCls}>
-        <Trophy className="w-4 h-4 text-yellow-500" />
-        <div>
-          <div className={`text-lg font-bold ${isNeu ? 'text-gray-700' : 'text-gray-800'}`}>
-            {streak.longestStreak}
-          </div>
-          <div className="text-xs text-gray-500">최장 기록</div>
-        </div>
-      </div>
-      <div className={cardCls}>
-        <Calendar className="w-4 h-4 text-blue-500" />
-        <div>
-          <div className={`text-lg font-bold ${isNeu ? 'text-gray-700' : 'text-gray-800'}`}>
-            {streak.totalDays}
-          </div>
-          <div className="text-xs text-gray-500">총 계획일</div>
-        </div>
-      </div>
+      ))}
     </div>
   );
 }
