@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { DayPlan, StreakData, Theme, TimeSlot, Todo, generateTimeSlots, todayStr } from './types';
+import { DayPlan, StreakData, Theme, TimeSlot, Todo, TodoState, generateTimeSlots, todayStr } from './types';
 
 interface AppState {
   theme: Theme;
@@ -161,15 +161,16 @@ export const useAppStore = create<AppState>()(
         set((s) => ({
           todos: [
             ...s.todos,
-            { id: crypto.randomUUID(), text: text.trim(), completed: false },
+            { id: crypto.randomUUID(), text: text.trim(), state: 'pending' as TodoState },
           ],
         }));
       },
 
       toggleTodo: (id) => {
+        const cycle: Record<TodoState, TodoState> = { pending: 'done', done: 'dropped', dropped: 'pending' };
         set((s) => ({
           todos: s.todos.map((t) =>
-            t.id === id ? { ...t, completed: !t.completed } : t
+            t.id === id ? { ...t, state: cycle[t.state] } : t
           ),
         }));
       },
@@ -179,7 +180,7 @@ export const useAppStore = create<AppState>()(
       },
 
       clearCompletedTodos: () => {
-        set((s) => ({ todos: s.todos.filter((t) => !t.completed) }));
+        set((s) => ({ todos: s.todos.filter((t) => t.state === 'pending') }));
       },
     }),
     { name: 'timebox-store' }

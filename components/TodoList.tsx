@@ -2,6 +2,19 @@
 import { useState, useRef, KeyboardEvent } from 'react';
 import { useAppStore } from '@/lib/store';
 import { X } from 'lucide-react';
+import { TodoState } from '@/lib/types';
+
+const STATE_ICON: Record<TodoState, string> = {
+  pending: '☐',
+  done:    '☑',
+  dropped: '☒',
+};
+
+const STATE_LABEL: Record<TodoState, string> = {
+  pending: '미완료',
+  done:    '완료',
+  dropped: '취소',
+};
 
 export default function TodoList({ theme }: { theme: string }) {
   const { todos, addTodo, toggleTodo, deleteTodo, clearCompletedTodos } = useAppStore();
@@ -20,8 +33,9 @@ export default function TodoList({ theme }: { theme: string }) {
     if (e.key === 'Enter') handleAdd();
   };
 
-  const completedCount = todos.filter((t) => t.completed).length;
+  const doneOrDropped = todos.filter((t) => t.state !== 'pending').length;
 
+  /* ── styles ── */
   const cardCls = isDark
     ? 'bg-[#18181B] border border-white/[0.07] rounded-2xl p-4'
     : 'bg-white border border-black/[0.07] rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] p-4';
@@ -30,18 +44,31 @@ export default function TodoList({ theme }: { theme: string }) {
     isDark ? 'text-[#3F3F46]' : 'text-[#C4BDB7]'
   }`;
 
+  const stateIconCls = (state: TodoState) => {
+    if (state === 'done')    return isDark ? 'text-indigo-400' : 'text-indigo-500';
+    if (state === 'dropped') return isDark ? 'text-[#52525B]'  : 'text-[#C4BDB7]';
+    return isDark ? 'text-[#52525B]' : 'text-[#D6D3D1]';
+  };
+
+  const textCls = (state: TodoState) => {
+    if (state === 'done')    return `line-through ${isDark ? 'text-[#52525B]' : 'text-[#C4BDB7]'}`;
+    if (state === 'dropped') return `line-through ${isDark ? 'text-[#3F3F46]' : 'text-[#D6D3D1]'}`;
+    return isDark ? 'text-[#E4E4E7]' : 'text-[#374151]';
+  };
+
   return (
     <div className={cardCls}>
+      {/* Header */}
       <div className={labelCls}>
         <span>Todo</span>
-        {completedCount > 0 && (
+        {doneOrDropped > 0 && (
           <button
             onClick={clearCompletedTodos}
             className={`text-[10px] normal-case tracking-normal transition-colors ${
               isDark ? 'text-[#52525B] hover:text-red-400' : 'text-[#C4BDB7] hover:text-red-400'
             }`}
           >
-            완료 삭제 ({completedCount})
+            완료·취소 삭제 ({doneOrDropped})
           </button>
         )}
       </div>
@@ -56,9 +83,7 @@ export default function TodoList({ theme }: { theme: string }) {
           onKeyDown={handleKey}
           placeholder="새 항목 추가..."
           className={`flex-1 bg-transparent outline-none text-sm ${
-            isDark
-              ? 'text-[#E4E4E7] placeholder-[#3F3F46]'
-              : 'text-[#374151] placeholder-[#D6D3D1]'
+            isDark ? 'text-[#E4E4E7] placeholder-[#3F3F46]' : 'text-[#374151] placeholder-[#D6D3D1]'
           }`}
         />
         <button
@@ -84,45 +109,28 @@ export default function TodoList({ theme }: { theme: string }) {
         {todos.map((todo) => (
           <div
             key={todo.id}
-            className={`flex items-center gap-2.5 group px-1 py-1.5 rounded-lg transition-colors ${
+            className={`flex items-center gap-2 group px-1 py-1.5 rounded-lg transition-colors ${
               isDark ? 'hover:bg-white/[0.03]' : 'hover:bg-black/[0.02]'
             }`}
           >
-            {/* Checkbox */}
+            {/* State icon — click cycles pending → done → dropped → pending */}
             <button
               onClick={() => toggleTodo(todo.id)}
-              className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${
-                todo.completed
-                  ? isDark
-                    ? 'border-indigo-500 bg-indigo-500'
-                    : 'border-indigo-400 bg-indigo-400'
-                  : isDark
-                  ? 'border-white/[0.15] hover:border-indigo-400'
-                  : 'border-black/[0.15] hover:border-indigo-400'
-              }`}
+              title={STATE_LABEL[todo.state]}
+              className={`font-mono text-sm shrink-0 w-5 text-center transition-colors ${stateIconCls(todo.state)} hover:opacity-70`}
             >
-              {todo.completed && (
-                <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 12 12">
-                  <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
+              {STATE_ICON[todo.state]}
             </button>
 
             {/* Text */}
-            <span
-              className={`flex-1 text-sm leading-snug transition-colors ${
-                todo.completed
-                  ? isDark ? 'line-through text-[#3F3F46]' : 'line-through text-[#C4BDB7]'
-                  : isDark ? 'text-[#E4E4E7]' : 'text-[#374151]'
-              }`}
-            >
+            <span className={`flex-1 text-sm leading-snug transition-colors ${textCls(todo.state)}`}>
               {todo.text}
             </span>
 
             {/* Delete */}
             <button
               onClick={() => deleteTodo(todo.id)}
-              className={`opacity-0 group-hover:opacity-100 transition-opacity ${
+              className={`opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ${
                 isDark ? 'text-[#3F3F46] hover:text-red-400' : 'text-[#D6D3D1] hover:text-red-400'
               }`}
             >

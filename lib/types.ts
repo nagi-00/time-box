@@ -1,9 +1,11 @@
 export type Theme = 'light' | 'dark';
 
+export type TodoState = 'pending' | 'done' | 'dropped';
+
 export interface Todo {
   id: string;
   text: string;
-  completed: boolean;
+  state: TodoState;
 }
 
 export interface TimeSlot {

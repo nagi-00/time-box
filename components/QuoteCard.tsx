@@ -1,62 +1,58 @@
 'use client';
 import { useMemo } from 'react';
 
-const QUOTES = [
-  { text: "You don't rise to the level of your goals, you fall to the level of your systems.", author: "James Clear" },
-  { text: "The key is not to prioritize what's on your schedule, but to schedule your priorities.", author: "Stephen Covey" },
-  { text: "Either you run the day, or the day runs you.", author: "Jim Rohn" },
-  { text: "What gets measured gets managed.", author: "Peter Drucker" },
-  { text: "Focus is the art of knowing what to ignore.", author: "James Clear" },
-  { text: "You have power over your mind, not outside events. Realize this, and you will find strength.", author: "Marcus Aurelius" },
-  { text: "It is not that we have a short time to live, but that we waste a great deal of it.", author: "Seneca" },
-  { text: "The most dangerous distractions are the ones you love, but that don't love you back.", author: "Warren Buffett" },
-  { text: "Discipline is the bridge between goals and accomplishment.", author: "Jim Rohn" },
-  { text: "Without great solitude, no serious work is possible.", author: "Pablo Picasso" },
-  { text: "The successful warrior is the average man with laser-like focus.", author: "Bruce Lee" },
-  { text: "Do one thing at a time, and while doing it put your whole soul into it.", author: "Swami Vivekananda" },
-  { text: "Work expands to fill the time allotted for its completion.", author: "Cyril Parkinson" },
-  { text: "Don't confuse activity with productivity.", author: "Tim Ferriss" },
-  { text: "A year from now you may wish you had started today.", author: "Karen Lamb" },
-  { text: "The art of being wise is knowing what to overlook.", author: "William James" },
-  { text: "Time is what we want most but use worst.", author: "William Penn" },
-  { text: "You need to think about what the one thing you want to do is.", author: "Elon Musk" },
-  { text: "The way to get started is to quit talking and begin doing.", author: "Walt Disney" },
-  { text: "Amateurs sit and wait for inspiration. The rest of us just get up and go to work.", author: "Stephen King" },
-  { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
-  { text: "Lose an hour in the morning, and you will be all day hunting for it.", author: "Richard Whately" },
-  { text: "Absorb what is useful. Reject what is useless. Add what is essentially your own.", author: "Bruce Lee" },
-  { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
-  { text: "You don't need more time. You need more focus.", author: "Robin Sharma" },
-  { text: "Think in the morning. Act in the noon. Read in the evening. Sleep in the night.", author: "William Blake" },
-  { text: "Concentrate all your thoughts upon the work at hand. The sun's rays do not burn until brought to a focus.", author: "Alexander Graham Bell" },
-  { text: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
-  { text: "Almost everything will work again if you unplug it for a few minutes, including you.", author: "Anne Lamott" },
-  { text: "Perfection is not attainable, but if we chase perfection we can catch excellence.", author: "Vince Lombardi" },
-  { text: "Waste no more time arguing about what a good man should be. Be one.", author: "Marcus Aurelius" },
+const MESSAGES = [
+  "지금, 너는 네가 선택한 삶과 거리를 두고 있어. 그 거리는 작지만, 계속되면 길이 될 거야.",
+  "잡념은 허기처럼 돌아와. 너는 이미 네가 무엇을 해야 하는지 알고 있어. 선택해. 집중해.",
+  "지금이야. 하루가 시작됐어. 계획을 세워. 네 시간을 직접 바라봐. 무엇이 중요한지, 어디에 집중해야 할지.",
+  "흐트러짐은 무의식의 방치야. 하지만 너는 이제 우연이 아니라, 의지로 살아야 하지.",
+  "집중은 고통이 아니라 선택이야. 너는 남을 위해 살지 않잖아. 너 자신에게 정직해져야 할 시간이야.",
+  "이건 단순한 작업이 아냐. 이건 너 자신을 잊지 않기 위한 의식이야.",
+  "네가 피로하다는 건 네가 살아 있다는 증거야. 하지만 집중하지 않으면, 그 피로는 의미가 없어져.",
+  "삶은 무한히 흘러가지만, 방향 없이 흐르면 침몰해. 너는 배를 띄운 사람이야.",
+  "네가 세운 구조가 네 마음을 가두지 않고, 지탱해주길 원했잖아. 그러려면 네가 그 구조를 지켜야 해.",
+  "다시 돌아와. 이건 작은 일이 아니야. 너의 하루가 만들어지는 순간이야.",
+  "네 이름을 기억해. 깨어 있어야 할 시간이야. 잠들지 마. 너를 붙들어.",
+  "방황은 끝났어. 집중은 정직함의 또 다른 얼굴이야.",
+  "너는 여기 있어야 해. 생각은 흐려질 수 있어. 하지만 의지는 선택이야.",
+  "다시 돌아와. 그 무엇도 지금 너보다 중요하지 않아.",
+  "선택할 시간이야. 마음을 붙잡아. 그 안에 네가 원하는 모든 게 있어.",
+  "이 순간이야. 너는 지금, 너를 다시 만드는 중이야.",
+  "다른 길을 찾지 마. 네가 있어야 할 길은 여기야.",
+  "숨을 고르고. 너 자신에게 예민해져. 그게 진짜 집중이야.",
+  "잠깐 멈춰. 집중은 정직함의 또 다른 얼굴이야.",
+  "스스로 세운 기준에 고개를 들고 서. 지금이야.",
+  "선택할 시간이야. 집중은 습관이 아니라, 매 순간의 각성이야.",
+  "지금 미루면, 결국 스스로를 미루게 돼.",
+  "흐려지는 집중 속에서도 너는 중심을 잡을 수 있어.",
+  "두려움은 거짓된 신호야. 네가 무엇을 할 수 있는지 알아.",
+  "가볍게 시작하되, 끝은 분명하게.",
+  "이 순간을 허투루 보내면, 너는 네 삶을 흘려보내게 돼.",
+  "익숙한 무기력 속에 안주하지 마. 넌 그걸 넘을 수 있어.",
+  "무의미한 반복 속에서도, 의식은 새로이 태어날 수 있어.",
+  "자기 자신을 지키는 건 가장 어려운 전투야. 하지만 넌 해낼 수 있어.",
+  "지금 선택하지 않으면, 네가 아닌 누군가가 대신 정할 거야.",
+  "방황은 끝났어. 너는 지금, 너를 다시 만드는 중이야.",
 ];
 
 function getDayOfYear(): number {
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
-  const diff = now.getTime() - start.getTime();
-  return Math.floor(diff / 86400000);
+  return Math.floor((now.getTime() - start.getTime()) / 86400000);
 }
 
 export default function QuoteCard({ theme }: { theme: string }) {
   const isDark = theme === 'dark';
-  const quote = useMemo(() => QUOTES[getDayOfYear() % QUOTES.length], []);
+  const message = useMemo(() => MESSAGES[getDayOfYear() % MESSAGES.length], []);
 
   return (
-    <div className={`w-full px-6 py-5 rounded-2xl ${
+    <div className={`w-full px-6 py-4 rounded-2xl ${
       isDark
         ? 'bg-[#18181B] border border-white/[0.07]'
         : 'bg-white border border-black/[0.07] shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
     }`}>
-      <p className={`text-sm leading-relaxed ${isDark ? 'text-[#A1A1AA]' : 'text-[#52525B]'}`}>
-        &ldquo;{quote.text}&rdquo;
-      </p>
-      <p className={`text-xs mt-2 font-medium ${isDark ? 'text-[#52525B]' : 'text-[#A8A29E]'}`}>
-        — {quote.author}
+      <p className={`text-sm leading-relaxed ${isDark ? 'text-[#71717A]' : 'text-[#6B7280]'}`}>
+        {message}
       </p>
     </div>
   );

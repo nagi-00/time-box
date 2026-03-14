@@ -21,7 +21,7 @@ export default function TimeboxPlanner() {
 
   return (
     <div className={`min-h-screen ${bg} transition-colors duration-300`}>
-      <div className="max-w-6xl mx-auto px-4 py-5">
+      <div id="timebox-capture" className="max-w-6xl mx-auto px-4 py-5">
 
         {/* ── Header ── */}
         <header className="flex items-center justify-between mb-5">
