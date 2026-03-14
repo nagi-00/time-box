@@ -6,29 +6,30 @@ export default function StreakBar({ theme }: { theme: string }) {
   const streak = useAppStore((s) => s.streak);
   const isDark = theme === 'dark';
 
-  const cardCls = isDark
-    ? 'flex items-center gap-3 px-4 py-3 bg-[#18181B] border border-white/[0.07] rounded-xl'
-    : 'flex items-center gap-3 px-4 py-3 bg-white border border-black/[0.07] rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)]';
+  const sep = <span className={`text-xs ${isDark ? 'text-[#27272A]' : 'text-[#E7E5E4]'}`}>·</span>;
 
-  const stats = [
-    { icon: Flame, label: '연속일', value: streak.currentStreak, iconCls: 'text-orange-400' },
-    { icon: Trophy, label: '최장 기록', value: streak.longestStreak, iconCls: 'text-yellow-400' },
-    { icon: Calendar, label: '총 계획일', value: streak.totalDays, iconCls: isDark ? 'text-indigo-400' : 'text-indigo-500' },
-  ];
+  const statCls = `flex items-center gap-1 text-xs ${isDark ? 'text-[#52525B]' : 'text-[#A8A29E]'}`;
+  const numCls = `font-semibold tabular-nums ${isDark ? 'text-[#71717A]' : 'text-[#78716C]'}`;
 
   return (
-    <div className="flex gap-3 flex-wrap">
-      {stats.map(({ icon: Icon, label, value, iconCls }) => (
-        <div key={label} className={cardCls}>
-          <Icon className={`w-4 h-4 shrink-0 ${iconCls}`} />
-          <div>
-            <div className={`text-xl font-semibold tabular-nums leading-none ${isDark ? 'text-[#FAFAFA]' : 'text-[#111111]'}`}>
-              {value}
-            </div>
-            <div className={`text-xs mt-0.5 ${isDark ? 'text-[#52525B]' : 'text-[#A8A29E]'}`}>{label}</div>
-          </div>
-        </div>
-      ))}
+    <div className="flex items-center gap-2.5">
+      <div className={statCls}>
+        <Flame className="w-3 h-3 text-orange-400" />
+        <span className={numCls}>{streak.currentStreak}</span>
+        <span>연속</span>
+      </div>
+      {sep}
+      <div className={statCls}>
+        <Trophy className="w-3 h-3 text-yellow-400" />
+        <span className={numCls}>{streak.longestStreak}</span>
+        <span>최장</span>
+      </div>
+      {sep}
+      <div className={statCls}>
+        <Calendar className="w-3 h-3 text-indigo-400" />
+        <span className={numCls}>{streak.totalDays}</span>
+        <span>일</span>
+      </div>
     </div>
   );
 }

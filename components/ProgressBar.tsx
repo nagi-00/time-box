@@ -13,33 +13,25 @@ export default function ProgressBar({ plan, theme }: { plan: DayPlan; theme: str
   const success = isDark ? '#4ADE80' : '#16A34A';
 
   return (
-    <div className={`px-4 py-3 rounded-xl flex items-center gap-4 ${
-      isDark
-        ? 'bg-[#18181B] border border-white/[0.07]'
-        : 'bg-white border border-black/[0.07] shadow-[0_1px_2px_rgba(0,0,0,0.04)]'
-    }`}>
-      <div className="flex-1">
-        <div className={`h-1 rounded-full overflow-hidden ${isDark ? 'bg-[#27272A]' : 'bg-[#F3F4F6]'}`}>
+    <div className="flex items-center gap-3">
+      <div className={`flex-1 h-0.5 rounded-full overflow-hidden ${isDark ? 'bg-[#27272A]' : 'bg-[#F3F4F6]'}`}>
+        <div
+          className="h-full rounded-full transition-all duration-700 relative"
+          style={{ width: `${filledPct}%`, backgroundColor: accent }}
+        >
           <div
-            className="h-full rounded-full transition-all duration-500 relative"
-            style={{ width: `${filledPct}%`, backgroundColor: accent }}
-          >
-            <div
-              className="h-full rounded-full absolute top-0 left-0 transition-all duration-500"
-              style={{ width: `${completedPct}%`, backgroundColor: success }}
-            />
-          </div>
+            className="h-full rounded-full absolute top-0 left-0 transition-all duration-700"
+            style={{ width: `${completedPct}%`, backgroundColor: success }}
+          />
         </div>
       </div>
-      <div className="flex items-center gap-4 text-xs shrink-0">
-        <span className={isDark ? 'text-[#52525B]' : 'text-[#A8A29E]'}>
-          계획{' '}
-          <span className="font-semibold tabular-nums" style={{ color: accent }}>{filledPct}%</span>
+      <div className={`flex items-center gap-3 text-[10px] shrink-0 ${isDark ? 'text-[#52525B]' : 'text-[#A8A29E]'}`}>
+        <span>
+          계획 <span className="font-semibold tabular-nums" style={{ color: accent }}>{filledPct}%</span>
         </span>
-        <span className={isDark ? 'text-[#52525B]' : 'text-[#A8A29E]'}>
-          완료{' '}
-          <span className="font-semibold tabular-nums" style={{ color: success }}>{completedPct}%</span>
-          <span className={`ml-1 ${isDark ? 'text-[#3F3F46]' : 'text-[#D1D5DB]'}`}>({completed}/{filled})</span>
+        <span>
+          완료 <span className="font-semibold tabular-nums" style={{ color: success }}>{completedPct}%</span>
+          <span className={`ml-1 ${isDark ? 'text-[#3F3F46]' : 'text-[#D6D3D1]'}`}>({completed}/{filled})</span>
         </span>
       </div>
     </div>

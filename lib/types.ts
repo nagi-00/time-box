@@ -1,5 +1,11 @@
 export type Theme = 'light' | 'dark';
 
+export interface Todo {
+  id: string;
+  text: string;
+  completed: boolean;
+}
+
 export interface TimeSlot {
   hour: number;
   half: 0 | 30;
@@ -23,7 +29,6 @@ export interface StreakData {
   totalDays: number;
 }
 
-export const HOURS = [5,6,7,8,9,10,11,12,1,2,3,4,5,6,7,8,9,10,11] as const;
 export const HOURS_24 = [5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23] as const;
 
 export const TASK_COLORS = [

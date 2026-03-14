@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { DayPlan, StreakData, Theme, TimeSlot, generateTimeSlots, todayStr } from './types';
+import { DayPlan, StreakData, Theme, TimeSlot, Todo, generateTimeSlots, todayStr } from './types';
 
 interface AppState {
   theme: Theme;
   plans: Record<string, DayPlan>;
   streak: StreakData;
   selectedDate: string;
+  todos: Todo[];
   setTheme: (t: Theme) => void;
   setSelectedDate: (d: string) => void;
   getCurrentPlan: () => DayPlan;
@@ -17,6 +18,10 @@ interface AppState {
   setSlotColor: (hour: number, half: 0 | 30, color: string) => void;
   clearDay: () => void;
   updateStreak: () => void;
+  addTodo: (text: string) => void;
+  toggleTodo: (id: string) => void;
+  deleteTodo: (id: string) => void;
+  clearCompletedTodos: () => void;
 }
 
 function makePlan(date: string, theme: Theme): DayPlan {
@@ -41,6 +46,7 @@ export const useAppStore = create<AppState>()(
         totalDays: 0,
       },
       selectedDate: todayStr(),
+      todos: [],
 
       setTheme: (t) => {
         set({ theme: t });
@@ -148,6 +154,32 @@ export const useAppStore = create<AppState>()(
           streak.totalDays += 1;
           return { streak };
         });
+      },
+
+      addTodo: (text) => {
+        if (!text.trim()) return;
+        set((s) => ({
+          todos: [
+            ...s.todos,
+            { id: crypto.randomUUID(), text: text.trim(), completed: false },
+          ],
+        }));
+      },
+
+      toggleTodo: (id) => {
+        set((s) => ({
+          todos: s.todos.map((t) =>
+            t.id === id ? { ...t, completed: !t.completed } : t
+          ),
+        }));
+      },
+
+      deleteTodo: (id) => {
+        set((s) => ({ todos: s.todos.filter((t) => t.id !== id) }));
+      },
+
+      clearCompletedTodos: () => {
+        set((s) => ({ todos: s.todos.filter((t) => !t.completed) }));
       },
     }),
     { name: 'timebox-store' }

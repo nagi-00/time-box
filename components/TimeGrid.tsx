@@ -1,12 +1,11 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAppStore } from '@/lib/store';
 import { DayPlan, TimeSlot, TASK_COLORS } from '@/lib/types';
 import { Check, RotateCcw } from 'lucide-react';
 
 function ColorPicker({
   onSelect,
-  onClose,
   isDark,
 }: {
   onSelect: (c: string) => void;
@@ -53,7 +52,22 @@ export default function TimeGrid({ plan, theme }: { plan: DayPlan; theme: string
   const { updateTimeSlot, toggleSlotComplete, setSlotColor } = useAppStore();
   const isDark = theme === 'dark';
   const [colorPickerSlot, setColorPickerSlot] = useState<string | null>(null);
+  const [now, setNow] = useState(() => new Date());
   const gridRef = useRef<HTMLDivElement>(null);
+  const currentRowRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Auto-scroll to current time on first render
+  useEffect(() => {
+    currentRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, []);
+
+  const currentHour = now.getHours();
+  const currentMin = now.getMinutes();
 
   const slotMap = new Map<string, TimeSlot>();
   plan.timeSlots.forEach((s) => slotMap.set(`${s.hour}-${s.half}`, s));
@@ -73,10 +87,6 @@ export default function TimeGrid({ plan, theme }: { plan: DayPlan; theme: string
 
   const inputCls = `flex-1 bg-transparent outline-none text-sm min-w-0 ${
     isDark ? 'text-[#E4E4E7] placeholder-[#3F3F46]' : 'text-[#374151] placeholder-[#E5E7EB]'
-  }`;
-
-  const timeLabelCls = `w-12 text-right shrink-0 font-mono text-[10px] font-medium ${
-    isDark ? 'text-[#3F3F46]' : 'text-[#D6D3D1]'
   }`;
 
   const actionBtnCls = `w-4 h-4 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shrink-0 ${
@@ -111,96 +121,122 @@ export default function TimeGrid({ plan, theme }: { plan: DayPlan; theme: string
           const s30 = slotMap.get(`${h}-30`);
           const key0 = `${h}-0`;
           const key30 = `${h}-30`;
+          const isCurrentHour = h === currentHour;
+          const isInRange = h >= 5 && h <= 23;
+
+          // Current time indicator: show red line above this row
+          const showTimeLine = isCurrentHour && isInRange && currentMin < 30;
+          const showTimeLineMid = isCurrentHour && isInRange && currentMin >= 30;
 
           return (
-            <div key={h} className="flex items-center gap-1">
-              {/* Time label */}
-              <div className={timeLabelCls}>{formatTimeLabel(h)}</div>
-
-              {/* :00 slot */}
-              <div
-                className={getSlotCls(s0)}
-                style={
-                  s0?.color
-                    ? { borderLeft: `2px solid ${s0.color}`, paddingLeft: '8px' }
-                    : { borderLeft: '2px solid transparent', paddingLeft: '8px' }
-                }
-              >
-                <input
-                  type="text"
-                  value={s0?.task || ''}
-                  onChange={(e) => updateTimeSlot(h, 0, e.target.value)}
-                  placeholder=""
-                  className={`${inputCls} ${s0?.completed ? 'line-through' : ''}`}
-                  style={s0?.color ? { color: s0.color } : {}}
-                />
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); toggleSlotComplete(h, 0); }}
-                    className={actionBtnCls}
-                  >
-                    {s0?.completed
-                      ? <RotateCcw className="w-2 h-2" />
-                      : <Check className="w-2 h-2" />
-                    }
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setColorPickerSlot(colorPickerSlot === key0 ? null : key0); }}
-                    className={colorDotCls}
-                    style={{ backgroundColor: s0?.color || (isDark ? '#27272A' : '#F3F4F6') }}
-                  />
-                  {colorPickerSlot === key0 && (
-                    <ColorPicker
-                      isDark={isDark}
-                      onSelect={(c) => { setSlotColor(h, 0, c); setColorPickerSlot(null); }}
-                      onClose={() => setColorPickerSlot(null)}
-                    />
-                  )}
+            <div key={h}>
+              {/* Current time line (before :00) */}
+              {showTimeLine && (
+                <div className="relative flex items-center gap-1 -mx-1 mb-px">
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0 ml-1" />
+                  <div className="flex-1 h-px bg-red-500 opacity-60" />
                 </div>
-              </div>
+              )}
 
-              {/* Vertical divider */}
-              <div className={dividerCls} />
-
-              {/* :30 slot */}
               <div
-                className={getSlotCls(s30)}
-                style={
-                  s30?.color
-                    ? { borderLeft: `2px solid ${s30.color}`, paddingLeft: '8px' }
-                    : { borderLeft: '2px solid transparent', paddingLeft: '8px' }
-                }
+                ref={isCurrentHour ? currentRowRef : undefined}
+                className="flex items-center gap-1"
               >
-                <input
-                  type="text"
-                  value={s30?.task || ''}
-                  onChange={(e) => updateTimeSlot(h, 30, e.target.value)}
-                  placeholder=""
-                  className={`${inputCls} ${s30?.completed ? 'line-through' : ''}`}
-                  style={s30?.color ? { color: s30.color } : {}}
-                />
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); toggleSlotComplete(h, 30); }}
-                    className={actionBtnCls}
-                  >
-                    {s30?.completed
-                      ? <RotateCcw className="w-2 h-2" />
-                      : <Check className="w-2 h-2" />
-                    }
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setColorPickerSlot(colorPickerSlot === key30 ? null : key30); }}
-                    className={colorDotCls}
-                    style={{ backgroundColor: s30?.color || (isDark ? '#27272A' : '#F3F4F6') }}
+                {/* Time label */}
+                <div
+                  className={`w-12 text-right shrink-0 font-mono text-[10px] font-medium ${
+                    isCurrentHour
+                      ? isDark ? 'text-red-400' : 'text-red-400'
+                      : isDark ? 'text-[#3F3F46]' : 'text-[#D6D3D1]'
+                  }`}
+                >
+                  {formatTimeLabel(h)}
+                </div>
+
+                {/* :00 slot */}
+                <div
+                  className={getSlotCls(s0)}
+                  style={
+                    s0?.color
+                      ? { borderLeft: `2px solid ${s0.color}`, paddingLeft: '8px' }
+                      : { borderLeft: '2px solid transparent', paddingLeft: '8px' }
+                  }
+                >
+                  <input
+                    type="text"
+                    value={s0?.task || ''}
+                    onChange={(e) => updateTimeSlot(h, 0, e.target.value)}
+                    placeholder=""
+                    className={`${inputCls} ${s0?.completed ? 'line-through' : ''}`}
+                    style={s0?.color ? { color: s0.color } : {}}
                   />
-                  {colorPickerSlot === key30 && (
-                    <ColorPicker
-                      isDark={isDark}
-                      onSelect={(c) => { setSlotColor(h, 30, c); setColorPickerSlot(null); }}
-                      onClose={() => setColorPickerSlot(null)}
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleSlotComplete(h, 0); }}
+                      className={actionBtnCls}
+                    >
+                      {s0?.completed ? <RotateCcw className="w-2 h-2" /> : <Check className="w-2 h-2" />}
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setColorPickerSlot(colorPickerSlot === key0 ? null : key0); }}
+                      className={colorDotCls}
+                      style={{ backgroundColor: s0?.color || (isDark ? '#27272A' : '#F3F4F6') }}
                     />
-                  )}
+                    {colorPickerSlot === key0 && (
+                      <ColorPicker
+                        isDark={isDark}
+                        onSelect={(c) => { setSlotColor(h, 0, c); setColorPickerSlot(null); }}
+                        onClose={() => setColorPickerSlot(null)}
+                      />
+                    )}
+                  </div>
+                </div>
+
+                {/* Mid-hour time line (between :00 and :30) */}
+                {showTimeLineMid && (
+                  <div className="flex items-center gap-0.5">
+                    <div className="w-1 h-1 rounded-full bg-red-500 shrink-0" />
+                  </div>
+                )}
+                {!showTimeLineMid && <div className={dividerCls} />}
+
+                {/* :30 slot */}
+                <div
+                  className={getSlotCls(s30)}
+                  style={
+                    s30?.color
+                      ? { borderLeft: `2px solid ${s30.color}`, paddingLeft: '8px' }
+                      : { borderLeft: '2px solid transparent', paddingLeft: '8px' }
+                  }
+                >
+                  <input
+                    type="text"
+                    value={s30?.task || ''}
+                    onChange={(e) => updateTimeSlot(h, 30, e.target.value)}
+                    placeholder=""
+                    className={`${inputCls} ${s30?.completed ? 'line-through' : ''}`}
+                    style={s30?.color ? { color: s30.color } : {}}
+                  />
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleSlotComplete(h, 30); }}
+                      className={actionBtnCls}
+                    >
+                      {s30?.completed ? <RotateCcw className="w-2 h-2" /> : <Check className="w-2 h-2" />}
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setColorPickerSlot(colorPickerSlot === key30 ? null : key30); }}
+                      className={colorDotCls}
+                      style={{ backgroundColor: s30?.color || (isDark ? '#27272A' : '#F3F4F6') }}
+                    />
+                    {colorPickerSlot === key30 && (
+                      <ColorPicker
+                        isDark={isDark}
+                        onSelect={(c) => { setSlotColor(h, 30, c); setColorPickerSlot(null); }}
+                        onClose={() => setColorPickerSlot(null)}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
